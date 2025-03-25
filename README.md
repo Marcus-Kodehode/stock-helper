@@ -18,6 +18,7 @@ Forbedre frontendstruktur og styling
 Utforske konsepter som datahenting, redigering i UI, caching og responsiv design
 
 ⚙️ Hvordan fungerer det – arkitektur og oppbygning så langt?
+
 React + Vite
 
 Applikasjonen er bygget med React (via Vite)
@@ -65,6 +66,7 @@ Prosjektet er bygget for å fungere selv når API-grensen er nådd
 Planlagt forbedring: lagre data i localStorage som fallback når kvoten er brukt opp
 
 🧪 Hva kommer etterhvert:
+ 
  Lagre porteføljen i localStorage (persistens)
 
  Egen oversikt for ønskeliste/følgeliste
