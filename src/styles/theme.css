@@ -1,0 +1,21 @@
+:root {
+    --primary: #004225;
+    --accent: #c9b037;
+    --positive: #23a55a;
+    --negative: #e64a4a;
+    --bg: #f9f9f9;
+    --text: #1b1b1b;
+    --table-border: #ccc;
+    --zebra: #f0f4f2;
+    --hover: #eaf4ea;
+    --font: 'Inter', sans-serif;
+  }
+  
+  body {
+    background-color: var(--bg);
+    font-family: var(--font);
+    color: var(--text);
+    margin: 0;
+    padding: 0;
+  }
+  
