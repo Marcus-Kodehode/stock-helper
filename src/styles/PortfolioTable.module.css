@@ -10,6 +10,11 @@
     background-color: white;
   }
   
+  h1    {
+    text-align: center;
+    color:#23a55a ;
+  }
+
   th {
     background-color: var(--primary);
     color: white;

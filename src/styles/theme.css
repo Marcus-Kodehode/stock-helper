@@ -1,6 +1,6 @@
 :root {
     --primary: #004225;
-    --accent: #c9b037;
+    --accent: hsl(50, 57%, 50%);
     --positive: #23a55a;
     --negative: #e64a4a;
     --bg: #f9f9f9;
