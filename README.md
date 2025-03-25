@@ -16,6 +16,7 @@ Målet med prosjektet er å:
 Forbedre frontendstruktur og styling
 
 Utforske konsepter som datahenting, redigering i UI, caching og responsiv design
+
 ⚙️ Hvordan fungerer det – arkitektur og oppbygning så langt?
 React + Vite
 
