@@ -1,32 +1,34 @@
-import styles from "../styles/PortfolioTable.module.css";
-import EditCell from "./EditCell";
+import React from 'react';
+import EditCell from './EditCell';
+import styles from '../styles/PortfolioTable.module.css';
 
-function PortfolioTable({ portfolio, quotes, loading, onUpdate }) {
+function PortfolioTable({ portfolio, quotes, loading, onUpdate, onDelete }) {
   if (loading) return <p>Laster kurser...</p>;
 
   const handleManualPriceUpdate = (ticker, newPrice) => {
-    const storedPrices = JSON.parse(localStorage.getItem("manualPrices")) || {};
+    const storedPrices = JSON.parse(localStorage.getItem('manualPrices')) || {};
     storedPrices[ticker] = newPrice;
-    localStorage.setItem("manualPrices", JSON.stringify(storedPrices));
-    onUpdate(ticker, "manualPrice", newPrice);
+    localStorage.setItem('manualPrices', JSON.stringify(storedPrices));
+    onUpdate(ticker, 'manualPrice', newPrice);
   };
 
-  const manualPrices = JSON.parse(localStorage.getItem("manualPrices")) || {};
+  const manualPrices = JSON.parse(localStorage.getItem('manualPrices')) || {};
 
   return (
     <table className={styles.table}>
       <thead>
         <tr>
-          <th>Ticker</th>
+          <th>Ticker (aksjesymbol)</th>
           <th>Navn</th>
-          <th>Antall</th>
-          <th>GAV</th>
+          <th>Antall (aksjer)</th>
+          <th>GAV (gj.sn. kjøpspris)</th>
           <th>Valuta</th>
-          <th>Kurs</th>
+          <th>Kurs (nåverdi)</th>
           <th>Endring (%)</th>
           <th>Markedsverdi</th>
           <th>Avkastning (NOK)</th>
           <th>Avkastning (%)</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -34,33 +36,34 @@ function PortfolioTable({ portfolio, quotes, loading, onUpdate }) {
           const quote = quotes[stock.ticker] || {};
           const apiPrice = quote.price;
           const price =
-            typeof apiPrice === "number" && apiPrice > 0
+            typeof apiPrice === 'number' && apiPrice > 0
               ? apiPrice
-              : manualPrices[stock.ticker] || 0;
+              : manualPrices[stock.ticker] ?? 0;
 
-          const change = quote.changePercent;
+          const changePercent = quote.changePercent ?? 0;
+
           const marketValue =
-            typeof price === "number" && stock.quantity
+            typeof price === 'number' && stock.quantity
               ? price * stock.quantity
               : null;
 
           const totalCost =
-            typeof stock.gav === "number" && stock.quantity
+            typeof stock.gav === 'number' && stock.quantity
               ? stock.gav * stock.quantity
               : null;
 
           const profit =
-            typeof marketValue === "number" && typeof totalCost === "number"
+            typeof marketValue === 'number' && typeof totalCost === 'number'
               ? marketValue - totalCost
               : null;
 
           const returnPercent =
-            typeof profit === "number" && totalCost > 0
+            typeof profit === 'number' && totalCost > 0
               ? (profit / totalCost) * 100
               : null;
 
-          const gavChange =
-            typeof price === "number" && typeof stock.gav === "number"
+          const gavChangePercent =
+            typeof stock.gav === 'number' && typeof price === 'number'
               ? ((price - stock.gav) / stock.gav) * 100
               : null;
 
@@ -71,53 +74,51 @@ function PortfolioTable({ portfolio, quotes, loading, onUpdate }) {
               <td>
                 <EditCell
                   value={stock.quantity}
-                  onSave={(val) => onUpdate(stock.ticker, "quantity", val)}
+                  onSave={(val) => onUpdate(stock.ticker, 'quantity', val)}
                 />
               </td>
               <td>
                 <EditCell
                   value={stock.gav}
-                  onSave={(val) => onUpdate(stock.ticker, "gav", val)}
+                  onSave={(val) => onUpdate(stock.ticker, 'gav', val)}
                 />
               </td>
               <td>{stock.currency}</td>
               <td>
                 <EditCell
-                  value={Number(price).toFixed(2)}
+                  value={price.toFixed(2)}
                   onSave={(val) =>
                     handleManualPriceUpdate(stock.ticker, Number(val))
                   }
                 />
               </td>
               <td>
-                {typeof gavChange === "number" ? (
+                {typeof gavChangePercent === 'number' ? (
                   <span
                     className={
-                      gavChange >= 0 ? styles.positive : styles.negative
+                      gavChangePercent >= 0 ? styles.positive : styles.negative
                     }
                   >
-                    {gavChange.toFixed(2)}%
+                    {gavChangePercent.toFixed(2)}%
                   </span>
                 ) : (
-                  "-"
+                  '-'
                 )}
               </td>
-              <td>{marketValue ? marketValue.toFixed(2) : "-"}</td>
+              <td>{marketValue ? marketValue.toFixed(2) : '-'}</td>
               <td>
-                {typeof profit === "number" ? (
+                {typeof profit === 'number' ? (
                   <span
-                    className={
-                      profit >= 0 ? styles.positive : styles.negative
-                    }
+                    className={profit >= 0 ? styles.positive : styles.negative}
                   >
                     {profit.toFixed(2)}
                   </span>
                 ) : (
-                  "-"
+                  '-'
                 )}
               </td>
               <td>
-                {typeof returnPercent === "number" ? (
+                {typeof returnPercent === 'number' ? (
                   <span
                     className={
                       returnPercent >= 0 ? styles.positive : styles.negative
@@ -126,8 +127,22 @@ function PortfolioTable({ portfolio, quotes, loading, onUpdate }) {
                     {returnPercent.toFixed(2)}%
                   </span>
                 ) : (
-                  "-"
+                  '-'
                 )}
+              </td>
+              <td>
+                <button
+                  onClick={() => onDelete(stock.ticker)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontSize: '1.1rem',
+                  }}
+                  title="Slett aksjepost"
+                >
+                  🗑️
+                </button>
               </td>
             </tr>
           );

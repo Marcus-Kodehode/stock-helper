@@ -1,6 +1,6 @@
 .table {
   width: 100%;
-  max-width: 1100px;
+  max-width: 1000px;
   margin: 0 auto;
   border-collapse: collapse;
   font-size: 0.95rem;
@@ -8,11 +8,6 @@
   border-radius: 8px;
   overflow: hidden;
   background-color: white;
-}
-
-h1 {
-  text-align: center;
-  color: #004225;
 }
 
 th {
@@ -62,36 +57,133 @@ tr:hover {
   }
 }
 
-.form {
+.form-wrapper {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-bottom: 2rem;
-  align-items: center;
   justify-content: center;
+  width: 100%;
+  margin-bottom: 2rem;
 }
 
-.form input,
-.form select {
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+  max-width: 1000px;
+  width: 100%;
+  padding: 1rem;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.form-wrapper input,
+.form-wrapper select,
+.form-wrapper button {
   padding: 0.6rem;
   border: 1px solid var(--table-border);
   border-radius: 4px;
   font-size: 0.9rem;
-  min-width: 140px;
+  height: 38px;
+  min-width: 160px;
+  max-width: 200px;
+  flex: 1 1 160px;
+  box-sizing: border-box;
 }
 
-.form button {
+.form-wrapper button {
   background-color: var(--primary);
   color: white;
-  padding: 0.6rem 1rem;
   font-weight: bold;
   border: none;
-  border-radius: 4px;
   cursor: pointer;
-  min-width: 110px;
-  margin-top: 0.3rem;
 }
 
-.form button:hover {
+.form-wrapper button:hover {
   background-color: #006e3d;
+}
+
+/* Autosuggest styling */
+.autosuggestWrapper {
+  position: relative;
+  min-width: 160px;
+  flex-shrink: 1;
+}
+
+.react-autosuggest__input {
+  padding: 0.6rem;
+  border: 1px solid var(--table-border);
+  border-radius: 4px;
+  font-size: 0.9rem;
+  height: 38px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.react-autosuggest__suggestions-container {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  z-index: 10;
+  background: white;
+  border: 1px solid #ccc;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+/* 💣 Fjerner prikker 100 % */
+.react-autosuggest__suggestions-list {
+  list-style: none !important;
+  padding-left: 0 !important;
+  margin: 0;
+}
+
+.react-autosuggest__suggestion {
+  list-style: none !important;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: block;
+}
+
+.react-autosuggest__suggestion--highlighted {
+  background-color: var(--hover);
+}
+
+/* Responsivt for små skjermer */
+@media screen and (max-width: 600px) {
+  .form-wrapper input,
+  .form-wrapper select,
+  .form-wrapper button {
+    min-width: 100px;
+    font-size: 0.8rem;
+  }
+}
+/* 🔨 Fjerner alle punkter med makt – gjelder alt inni suggestions */
+.react-autosuggest__suggestions-list,
+.react-autosuggest__suggestions-list li {
+  list-style: none !important;
+  list-style-type: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* 💀 Dreper pseudo-elementer som lager prikker i noen nettlesere */
+.react-autosuggest__suggestions-list li::marker,
+.react-autosuggest__suggestions-list li::before {
+  content: none !important;
+  display: none !important;
+}
+
+/* 💪 Sikrer layouten din */
+.react-autosuggest__suggestion {
+  padding: 0.5rem 1rem !important;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: block !important;
 }
