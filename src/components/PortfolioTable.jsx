@@ -4,6 +4,15 @@ import EditCell from "./EditCell";
 function PortfolioTable({ portfolio, quotes, loading, onUpdate }) {
   if (loading) return <p>Laster kurser...</p>;
 
+  const handleManualPriceUpdate = (ticker, newPrice) => {
+    const storedPrices = JSON.parse(localStorage.getItem("manualPrices")) || {};
+    storedPrices[ticker] = newPrice;
+    localStorage.setItem("manualPrices", JSON.stringify(storedPrices));
+    onUpdate(ticker, "manualPrice", newPrice);
+  };
+
+  const manualPrices = JSON.parse(localStorage.getItem("manualPrices")) || {};
+
   return (
     <table className={styles.table}>
       <thead>
@@ -23,9 +32,13 @@ function PortfolioTable({ portfolio, quotes, loading, onUpdate }) {
       <tbody>
         {portfolio.map((stock) => {
           const quote = quotes[stock.ticker] || {};
-          const price = quote.price;
-          const change = quote.changePercent;
+          const apiPrice = quote.price;
+          const price =
+            typeof apiPrice === "number" && apiPrice > 0
+              ? apiPrice
+              : manualPrices[stock.ticker] || 0;
 
+          const change = quote.changePercent;
           const marketValue =
             typeof price === "number" && stock.quantity
               ? price * stock.quantity
@@ -46,6 +59,11 @@ function PortfolioTable({ portfolio, quotes, loading, onUpdate }) {
               ? (profit / totalCost) * 100
               : null;
 
+          const gavChange =
+            typeof price === "number" && typeof stock.gav === "number"
+              ? ((price - stock.gav) / stock.gav) * 100
+              : null;
+
           return (
             <tr key={stock.ticker}>
               <td>{stock.ticker}</td>
@@ -63,15 +81,22 @@ function PortfolioTable({ portfolio, quotes, loading, onUpdate }) {
                 />
               </td>
               <td>{stock.currency}</td>
-              <td>{typeof price === "number" ? price.toFixed(2) : "-"}</td>
               <td>
-                {typeof change === "number" ? (
+                <EditCell
+                  value={Number(price).toFixed(2)}
+                  onSave={(val) =>
+                    handleManualPriceUpdate(stock.ticker, Number(val))
+                  }
+                />
+              </td>
+              <td>
+                {typeof gavChange === "number" ? (
                   <span
                     className={
-                      change > 0 ? styles.positive : styles.negative
+                      gavChange >= 0 ? styles.positive : styles.negative
                     }
                   >
-                    {change.toFixed(2)}%
+                    {gavChange.toFixed(2)}%
                   </span>
                 ) : (
                   "-"

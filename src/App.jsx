@@ -3,29 +3,47 @@ import axios from "axios";
 import PortfolioTable from "./components/PortfolioTable";
 import "./App.css";
 
-const initialPortfolio = [
-  { ticker: "AKERBP.OL", name: "Aker BP", quantity: 40, gav: 247.02, currency: "NOK" },
-  { ticker: "HOEGH.OL", name: "Hoegh Autoliners", quantity: 115, gav: 90.15, currency: "NOK" },
-  { ticker: "PPG.OL", name: "Pioneer Property Group", quantity: 80, gav: 89.83, currency: "NOK" },
-  { ticker: "RANA.OL", name: "Rana Gruber", quantity: 76, gav: 60.10, currency: "NOK" },
-  { ticker: "DOF.OL", name: "DOF Group", quantity: 56, gav: 86.06, currency: "NOK" },
-  { ticker: "ENSU.OL", name: "Ensurge Micropower", quantity: 2340, gav: 0.75, currency: "NOK" },
-  { ticker: "MPCC.OL", name: "MPC Container Ships", quantity: 124, gav: 16.22, currency: "NOK" }
-];
+const LOCAL_KEY = "aksjeportefolje";
+const MANUAL_KEY = "manualPrices";
 
 function App() {
-  const [portfolio, setPortfolio] = useState(initialPortfolio);
+  const [portfolio, setPortfolio] = useState(() => {
+    const stored = localStorage.getItem(LOCAL_KEY);
+    return stored ? JSON.parse(stored) : [];
+  });
   const [quotes, setQuotes] = useState({});
   const [loading, setLoading] = useState(true);
+  const [inputs, setInputs] = useState({
+    ticker: "",
+    name: "",
+    quantity: "",
+    gav: "",
+    currency: "NOK",
+  });
 
   const API_KEY = "67e29047935b76.95928858";
+
+  useEffect(() => {
+    localStorage.setItem(LOCAL_KEY, JSON.stringify(portfolio));
+  }, [portfolio]);
 
   useEffect(() => {
     const fetchQuotes = async () => {
       setLoading(true);
       const newQuotes = {};
+      const manualPrices = JSON.parse(localStorage.getItem(MANUAL_KEY) || "{}");
 
       for (const stock of portfolio) {
+        if (manualPrices[stock.ticker]) {
+          newQuotes[stock.ticker] = {
+            price: manualPrices[stock.ticker],
+            change: null,
+            changePercent: null,
+            manual: true,
+          };
+          continue;
+        }
+
         try {
           const res = await axios.get(
             `https://eodhistoricaldata.com/api/real-time/${stock.ticker}?api_token=${API_KEY}&fmt=json`
@@ -37,35 +55,9 @@ function App() {
 
           if (!isNaN(price) && price > 0) {
             newQuotes[stock.ticker] = { price, change, changePercent };
-            continue;
-          }
-
-          try {
-            const fallback = await axios.get(
-              `https://eodhistoricaldata.com/api/eod/${stock.ticker}?api_token=${API_KEY}&fmt=json&limit=1`
-            );
-
-            const data = fallback.data;
-            if (Array.isArray(data) && data.length > 0) {
-              const last = data[0];
-              const fallbackPrice = parseFloat(last.close);
-              const fallbackChange = parseFloat(last.change);
-              const fallbackChangePercent = parseFloat(last.change_p);
-
-              newQuotes[stock.ticker] = {
-                price: isNaN(fallbackPrice) ? null : fallbackPrice,
-                change: isNaN(fallbackChange) ? null : fallbackChange,
-                changePercent: isNaN(fallbackChangePercent)
-                  ? null
-                  : fallbackChangePercent
-              };
-              continue;
-            }
-          } catch (eodFallbackError) {
-            console.warn(`EOD fallback feilet for ${stock.ticker}`);
           }
         } catch (error) {
-          console.error("Feil ved henting av data for", stock.ticker, error);
+          console.error("Feil ved henting av kurser", error);
         }
       }
 
@@ -84,20 +76,78 @@ function App() {
     );
   };
 
+  const handleManualPrice = (ticker, price) => {
+    const updated = { ...quotes[ticker], price: parseFloat(price), manual: true };
+    const manualPrices = JSON.parse(localStorage.getItem(MANUAL_KEY) || "{}");
+    manualPrices[ticker] = updated.price;
+    localStorage.setItem(MANUAL_KEY, JSON.stringify(manualPrices));
+    setQuotes((prev) => ({ ...prev, [ticker]: updated }));
+  };
+
+  const addStock = () => {
+    const { ticker, name, quantity, gav, currency } = inputs;
+    if (!ticker || !name || !quantity || !gav) return;
+    setPortfolio((prev) => [
+      ...prev,
+      { ticker, name, quantity: Number(quantity), gav: Number(gav), currency },
+    ]);
+    setInputs({ ticker: "", name: "", quantity: "", gav: "", currency: "NOK" });
+  };
+
   return (
     <div className="app-container">
       <h1>Min aksjeoversikt</h1>
-      <PortfolioTable
-        portfolio={portfolio}
-        quotes={quotes}
-        loading={loading}
-        onUpdate={handleUpdate}
-      />
+      <div className="input-row">
+        <input
+          placeholder="Ticker (f.eks. AKERBP.OL)"
+          value={inputs.ticker}
+          onChange={(e) => setInputs({ ...inputs, ticker: e.target.value })}
+        />
+        <input
+          placeholder="Navn"
+          value={inputs.name}
+          onChange={(e) => setInputs({ ...inputs, name: e.target.value })}
+        />
+        <input
+          placeholder="Antall"
+          type="number"
+          value={inputs.quantity}
+          onChange={(e) => setInputs({ ...inputs, quantity: e.target.value })}
+        />
+        <input
+          placeholder="GAV"
+          type="number"
+          value={inputs.gav}
+          onChange={(e) => setInputs({ ...inputs, gav: e.target.value })}
+        />
+        <select
+          value={inputs.currency}
+          onChange={(e) => setInputs({ ...inputs, currency: e.target.value })}
+        >
+          <option value="NOK">NOK</option>
+          <option value="USD">USD</option>
+        </select>
+        <button onClick={addStock}>Legg til aksje</button>
+      </div>
+
+      {loading ? (
+        <p>Laster kurser...</p>
+      ) : (
+        <PortfolioTable
+          portfolio={portfolio}
+          quotes={quotes}
+          onUpdate={handleUpdate}
+          onManualPrice={handleManualPrice}
+        />
+      )}
     </div>
   );
 }
 
 export default App;
+
+
+
 
 // 💍 One bug to find them,
 // 🔥 One fix to bring them all,

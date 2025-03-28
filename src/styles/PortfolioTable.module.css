@@ -1,64 +1,97 @@
 .table {
-    width: 100%;
-    max-width: 1100px;
-    margin: 0 auto;
-    border-collapse: collapse;
-    font-size: 0.95rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    border-radius: 8px;
-    overflow: hidden;
-    background-color: white;
-  }
-  
-  h1    {
-    text-align: center;
-    color:#004225 ;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: white;
+}
+
+h1 {
+  text-align: center;
+  color: #004225;
+}
+
+th {
+  background-color: var(--primary);
+  color: white;
+  padding: 1rem;
+  text-align: left;
+  white-space: nowrap;
+}
+
+td {
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid var(--table-border);
+  white-space: nowrap;
+}
+
+tr:nth-child(even) {
+  background-color: var(--zebra);
+}
+
+tr:hover {
+  background-color: var(--hover);
+}
+
+.positive {
+  color: var(--positive);
+  font-weight: 600;
+}
+
+.negative {
+  color: var(--negative);
+  font-weight: 600;
+}
+
+/* Mobilvennlig */
+@media screen and (max-width: 768px) {
+  .table {
+    font-size: 0.8rem;
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
   }
 
-  th {
-    background-color: var(--primary);
-    color: white;
-    padding: 1rem;
-    text-align: left;
-    white-space: nowrap;
-  }
-  
+  th,
   td {
-    padding: 0.9rem 1rem;
-    border-bottom: 1px solid var(--table-border);
-    white-space: nowrap;
+    padding: 0.75rem;
   }
-  
-  tr:nth-child(even) {
-    background-color: var(--zebra);
-  }
-  
-  tr:hover {
-    background-color: var(--hover);
-  }
-  
-  .positive {
-    color: var(--positive);
-    font-weight: 600;
-  }
-  
-  .negative {
-    color: var(--negative);
-    font-weight: 600;
-  }
-  
-  /* 📱 Mobiltilpasning */
-  @media screen and (max-width: 768px) {
-    .table {
-      font-size: 0.8rem;
-      display: block;
-      overflow-x: auto;
-      white-space: nowrap;
-    }
-  
-    th,
-    td {
-      padding: 0.75rem;
-    }
-  }
-  
+}
+
+.form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.form input,
+.form select {
+  padding: 0.6rem;
+  border: 1px solid var(--table-border);
+  border-radius: 4px;
+  font-size: 0.9rem;
+  min-width: 140px;
+}
+
+.form button {
+  background-color: var(--primary);
+  color: white;
+  padding: 0.6rem 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  min-width: 110px;
+  margin-top: 0.3rem;
+}
+
+.form button:hover {
+  background-color: #006e3d;
+}
